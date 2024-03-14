@@ -44,7 +44,7 @@ You awaken in a cold, dimly lit room. ->atMattress
  * (examineWindow1) [Examine window] It's a sliding glass window. ->atWindow
  + (examineWindow2) {examineWindow1 && !window_open && !window_unlocked} [Examine more] There's a small hole at the bottom of the window. 
     {inventory ? key:(<i>Maybe the key I have will unlock it?</i>)|(<i>Looks like a key might fit.</i>)} ->atWindow
- + {examineWindow1 && !openWindow1 && !window_open && !window_unlocked} [Open window] You attempt to open the window. It refuses to budge.
+ + (openWindow2) {examineWindow1 && !openWindow1 && !window_open && !window_unlocked} [Open window] You attempt to open the window. It refuses to budge.
     + + [Try again] You try to open the window, again. Still nothing. 
         (<i>Should I try one more time?</i>)
         + + + (openWindow1) [Try again] You try again, putting a little more effort into it. 
@@ -62,15 +62,18 @@ You awaken in a cold, dimly lit room. ->atMattress
  + {LIST_COUNT(inventory) > 0} [Use...]
     + + {inventory ? note} [Note]
         + + + [with]
-            + + + + [Window] Nothing happens. ->atWindow
+            + + + + {!window_open} [Window] Nothing happens. ->atWindow
+            + + + + {window_open} [Window] You toss the note out of the open window.</br></br>(<i>Hope I didn't need that...</i>)
+                ~ inventory -= note
+                ->atWindow
             + + + + {examineWindow2} [Keyhole] You fold the note and put it in the keyhole. Nothing happens. </br></br>(<i>What did I expect?</i>) ->atWindow
     + + {inventory ? key} [Key]
         + + + [with]
-            + + + + {!window_unlocked} [Window] (<i>I think this key might unlock the window...</i>) ->atMattress
+            + + + + {!window_unlocked} [Window] {examineWindow2:(<i>I think this key might unlock the window...</i>)|{openWindow2:The window won't budge. (<i>I might need to find a place to use this key...</i>)|You scratch the glass with the key. (<i>Heh, take that, window.</i>)}} ->atWindow
             + + + + {window_open} [Window] You toss the key out of the open window.</br></br>(<i>Hope I didn't need that...</i>)
                 ~ inventory -= key
-                ->atMattress
-            + + + + {window_unlocked && !window_open } [Window] You scratch the glass with the key. (<i>Heh, take that, window.</i>) ->atMattress
+                ->atWindow
+            + + + + {window_unlocked && !window_open } [Window] You scratch the glass with the key. (<i>Heh, take that, window.</i>) ->atWindow
             + + + + {examineWindow2 && !window_unlocked} [Keyhole] You insert the key into the small hole at the base of the window. *<i>click</i>*
                 ~ window_unlocked = true
                 ->atWindow
